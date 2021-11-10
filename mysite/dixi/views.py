@@ -1,8 +1,9 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from .models import Product
+from rest_framework import permissions
+from .permissions import OwnerPat
 from .serializers import *
+from rest_framework import generics
 
 
 class ProductListView(APIView):
@@ -33,7 +34,7 @@ class ReviewsView(APIView):
 
 
 class ReviewsDetailView(APIView):
-    'Описание продукта'
+    'Вывод отзыва'
 
     def get(self, request, pk):
         query = Reviews.objects.get(id=pk)
@@ -41,10 +42,16 @@ class ReviewsDetailView(APIView):
         return Response(serializer.data)
 
 
-class ReviewsCreateView(APIView):
-    'Добавление отзыва'
-    def post(self, request):
-        review = ReviewsSerializer(data=request.data)
-        if review.is_valid():
-            review.save()
-        return Response(status=201)
+class ReviewCreateView(generics.CreateAPIView):
+    queryset = Reviews.objects.all()
+    serializer_class = ReviewsSerializer
+    permission_classes = [OwnerPat, permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class ReviewUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Reviews.objects.all()
+    serializer_class = ReviewsSerializer
+    permission_classes = [OwnerPat]

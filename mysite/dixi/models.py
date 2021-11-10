@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 
 class Product(models.Model):
@@ -94,6 +95,7 @@ class Gallery(models.Model):
 
 
 class Reviews(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
     email = models.EmailField()
     name = models.CharField(max_length=100, verbose_name='Имя')
     text = models.TextField(max_length=5000, verbose_name='Отзыв')
