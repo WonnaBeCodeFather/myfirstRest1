@@ -1,3 +1,4 @@
+import requests_oauthlib
 from rest_framework import serializers
 
 from .models import *
@@ -10,7 +11,7 @@ class ReviewsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class FilterReviewListSerializer(serializers.ListSerializer):
+class FilterReviewsListSerializer(serializers.ListSerializer):
     def to_representation(self, data):
         data = data.filter(parent=None)
         return super().to_representation(data)
@@ -26,7 +27,7 @@ class ReviewsParentSerializer(serializers.ModelSerializer):
     children = RecursiveSerializer(many=True)
 
     class Meta:
-        list_serializer_class = FilterReviewListSerializer
+        list_serializer_class = FilterReviewsListSerializer
         model = Reviews
         fields = ('id', 'name', 'text', 'children')
 
@@ -93,14 +94,20 @@ class CartCreateSerializer(serializers.ModelSerializer):
 
 # Order
 class OrderSerializer(serializers.ModelSerializer):
-    cart = CartDetailSerializer()
-
     class Meta:
         model = Order
         fields = '__all__'
 
-class OrderCreateSerializer(serializers.ModelSerializer):
 
+class OrderDetailSerializer(serializers.ModelSerializer):
+    owner = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = Order
+        exclude = ['cart']
+
+
+class OrderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['first_name', 'last_name', 'phone_number', 'delivery_address', 'description']

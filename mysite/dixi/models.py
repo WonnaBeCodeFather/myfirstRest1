@@ -1,10 +1,7 @@
-
-
+from django.http import Http404
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
-
-
 
 
 class Product(models.Model):
@@ -63,6 +60,10 @@ class Price(models.Model):
     def __str__(self):
         return f'Цена для {self.name_model}'
 
+    """Если поле discount_bool = True, то автоматически заполнятеся поле new_price с учётом указанной скидки в 
+    процентах, а иначе поля new_price и discount устанавливаются в 0. Поле price остаётся неизменным в любом случае.
+    """
+
     def save(self, *args, **kwargs):
         if self.discount_bool:
             new_price = float(self.price) - (float(self.price) * (float(self.discount) / 100))
@@ -102,7 +103,6 @@ class Gallery(models.Model):
 
 class Reviews(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
-    email = models.EmailField()
     name = models.CharField(max_length=100, verbose_name='Имя')
     text = models.TextField(max_length=5000, verbose_name='Отзыв')
     name_product = models.ForeignKey(Product, verbose_name='Название продукта', on_delete=models.CASCADE,
@@ -119,10 +119,10 @@ class Reviews(models.Model):
 
 
 class Cart(models.Model):
-    owner = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Корзина для пользователя')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Корзина для пользователя')
     products = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукты в корзине')
     amount = models.PositiveIntegerField(default=1, verbose_name='Количество товара')
-    price = models.DecimalField(decimal_places=2, max_digits=7, blank=True)
+    price = models.DecimalField(decimal_places=2, max_digits=7, blank=True, verbose_name='Общая Цена')
 
     class Meta:
         verbose_name = 'Корзина'
@@ -131,27 +131,45 @@ class Cart(models.Model):
     def __str__(self):
         return f'Корзина пользователя {self.owner}'
 
+    """Если на продукт в корзине есть скидка то в общую стоимость продукта входит цена с учётом скидки"""
+
     def save(self, *args, **kwargs):
         if Price.objects.get(name_model=self.products).discount_bool:
             self.price = Price.objects.get(name_model=self.products).new_price
+            self.price = self.price * self.amount
         else:
             self.price = Price.objects.get(name_model=self.products).price
+            self.price = self.price * self.amount
         super(Cart, self).save(*args, **kwargs)
 
 
 class Order(models.Model):
-    cart = models.OneToOneField(Cart, on_delete=models.CASCADE, null=True)
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Заказ Пользователя')
     first_name = models.CharField(max_length=100, verbose_name='Имя')
     last_name = models.CharField(max_length=100, verbose_name='Фамилия')
     phone_number = models.CharField(max_length=13, verbose_name='Номер телефона')
     delivery_address = models.CharField(max_length=500, verbose_name='Адресс доставки')
     description = models.TextField(verbose_name='Комментарий', blank=True, null=True)
-
+    final_price = models.TextField(verbose_name='Итоговая Цена', blank=True)
+    cart = models.ForeignKey(Cart, verbose_name='Наличие Корзины', null=True, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Оформление заказа'
         verbose_name_plural = verbose_name
 
+    """Получение корзин пользователя(этот костыль я сделал для того, что бы не создать оформление заказа для чужой 
+    корзины) Если при создании оформления заказа не находится корзина аунтифицированого пользователя, то 404"""
+
+    def save(self, *args, **kwargs):
+        lists = []
+        for i in Cart.objects.filter(owner=self.owner):
+            lists.append(float(i.price))
+        self.final_price = sum(lists)
+        try:
+            self.cart = Cart.objects.filter(owner=self.owner)[0]
+        except IndexError:
+            raise Http404
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f'Заказ для {self.last_name} {self.first_name}'
-
