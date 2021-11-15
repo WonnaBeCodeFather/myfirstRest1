@@ -1,10 +1,8 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
-class OwnerPat(BasePermission):
-    """
-    The request is authenticated as a user, or is a read-only request.
-    """
+class OwnerPermission(BasePermission):
+
 
     def has_object_permission(self, request, view, obj):
         return bool(
@@ -12,3 +10,5 @@ class OwnerPat(BasePermission):
             request.user and
             request.user.is_authenticated and obj.owner == request.user or request.user.is_staff
         )
+
+

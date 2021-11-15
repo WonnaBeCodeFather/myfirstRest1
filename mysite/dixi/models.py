@@ -1,6 +1,10 @@
+
+
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
+
+
 
 
 class Product(models.Model):
@@ -18,10 +22,10 @@ class Product(models.Model):
     category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
     slug = models.SlugField(unique=True)
     amount = models.IntegerField(verbose_name='Количество товара', default=0)
-    season = models.CharField(max_length=50, verbose_name='Сезон', choices=Season.choices)
+    season = models.IntegerField(verbose_name='Сезон', choices=Season.choices)
     factory = models.CharField(max_length=50, verbose_name='Фабрика')
     size = models.IntegerField(verbose_name='Размер обуви', default=36)
-    gender = models.CharField(max_length=50, verbose_name='Пол', choices=Gender.choices)
+    gender = models.IntegerField(verbose_name='Пол', choices=Gender.choices)
 
     def __str__(self):
         return self.name
@@ -48,8 +52,9 @@ class Category(models.Model):
 
 class Price(models.Model):
     name_model = models.OneToOneField(Product, on_delete=models.CASCADE, verbose_name='Модель',
-                                      related_name='price_model_1')
-    price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена товара', default=00.00)
+                                      related_name='price')
+    price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена товара', default=00.00,
+                                )
     discount_bool = models.BooleanField(default=False, verbose_name='Наличие скидки')
     discount = models.PositiveIntegerField(default=0, blank=True, verbose_name='Скидка в %')
     new_price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена товара с учетом скидки',
@@ -64,6 +69,7 @@ class Price(models.Model):
             self.new_price = new_price
         else:
             self.new_price = 0.00
+            self.discount = 0
         super(Price, self).save(*args, **kwargs)
 
     class Meta:
@@ -110,3 +116,42 @@ class Reviews(models.Model):
 
     def __str__(self):
         return f'Отзыв на модель {self.name_product}'
+
+
+class Cart(models.Model):
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Корзина для пользователя')
+    products = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукты в корзине')
+    amount = models.PositiveIntegerField(default=1, verbose_name='Количество товара')
+    price = models.DecimalField(decimal_places=2, max_digits=7, blank=True)
+
+    class Meta:
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзина'
+
+    def __str__(self):
+        return f'Корзина пользователя {self.owner}'
+
+    def save(self, *args, **kwargs):
+        if Price.objects.get(name_model=self.products).discount_bool:
+            self.price = Price.objects.get(name_model=self.products).new_price
+        else:
+            self.price = Price.objects.get(name_model=self.products).price
+        super(Cart, self).save(*args, **kwargs)
+
+
+class Order(models.Model):
+    cart = models.OneToOneField(Cart, on_delete=models.CASCADE, null=True)
+    first_name = models.CharField(max_length=100, verbose_name='Имя')
+    last_name = models.CharField(max_length=100, verbose_name='Фамилия')
+    phone_number = models.CharField(max_length=13, verbose_name='Номер телефона')
+    delivery_address = models.CharField(max_length=500, verbose_name='Адресс доставки')
+    description = models.TextField(verbose_name='Комментарий', blank=True, null=True)
+
+
+    class Meta:
+        verbose_name = 'Оформление заказа'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return f'Заказ для {self.last_name} {self.first_name}'
+
