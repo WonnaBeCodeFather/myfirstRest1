@@ -2,6 +2,7 @@ from django.http import Http404
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 
 
 class Product(models.Model):
@@ -71,6 +72,7 @@ class Price(models.Model):
         else:
             self.new_price = 0.00
             self.discount = 0
+
         super(Price, self).save(*args, **kwargs)
 
     class Meta:
@@ -119,17 +121,28 @@ class Reviews(models.Model):
 
 
 class Cart(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Корзина для пользователя')
-    products = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукты в корзине')
-    amount = models.PositiveIntegerField(default=1, verbose_name='Количество товара')
-    price = models.DecimalField(decimal_places=2, max_digits=7, blank=True, verbose_name='Общая Цена')
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Владелец корзины')
+
+    def __str__(self):
+        return f'Корзина для пользователя {self.owner}'
 
     class Meta:
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзина'
 
+
+class CartProduct(models.Model):
+    owner = models.ForeignKey(Cart, on_delete=models.CASCADE, verbose_name='Корзина для пользователя', null=True)
+    products = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукты в корзине')
+    amount = models.PositiveIntegerField(default=1, verbose_name='Количество товара')
+    price = models.DecimalField(decimal_places=2, max_digits=7, blank=True, verbose_name='Общая Цена')
+
+    class Meta:
+        verbose_name = 'Товар в корзине'
+        verbose_name_plural = 'Товары в корзине'
+
     def __str__(self):
-        return f'Корзина пользователя {self.owner}'
+        return f'Товары пользователя {self.owner}'
 
     """Если на продукт в корзине есть скидка то в общую стоимость продукта входит цена с учётом скидки"""
 
@@ -140,36 +153,40 @@ class Cart(models.Model):
         else:
             self.price = Price.objects.get(name_model=self.products).price
             self.price = self.price * self.amount
-        super(Cart, self).save(*args, **kwargs)
+        super(CartProduct, self).save(*args, **kwargs)
 
 
 class Order(models.Model):
-    owner = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Заказ Пользователя')
+    owner = models.OneToOneField(Cart, on_delete=models.SET_NULL, verbose_name='Заказ Пользователя', null=True)
     first_name = models.CharField(max_length=100, verbose_name='Имя')
     last_name = models.CharField(max_length=100, verbose_name='Фамилия')
     phone_number = models.CharField(max_length=13, verbose_name='Номер телефона')
     delivery_address = models.CharField(max_length=500, verbose_name='Адресс доставки')
     description = models.TextField(verbose_name='Комментарий', blank=True, null=True)
     final_price = models.TextField(verbose_name='Итоговая Цена', blank=True)
-    cart = models.ForeignKey(Cart, verbose_name='Наличие Корзины', null=True, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Оформление заказа'
         verbose_name_plural = verbose_name
 
-    """Получение корзин пользователя(этот костыль я сделал для того, что бы не создать оформление заказа для чужой 
-    корзины) Если при создании оформления заказа не находится корзина аунтифицированого пользователя, то 404"""
+    """Пересчет общей суммы заказа, отправка письма с содержимым заказа на почту(админа), 
+    при создании заказа корзина(создавшего заказ) со всем содержимым удаляется"""
 
     def save(self, *args, **kwargs):
         lists = []
-        for i in Cart.objects.filter(owner=self.owner):
+        for i in CartProduct.objects.filter(owner=self.owner):
             lists.append(float(i.price))
         self.final_price = sum(lists)
-        try:
-            self.cart = Cart.objects.filter(owner=self.owner)[0]
-        except IndexError:
-            raise Http404
+        send_mail(subject='Test', message=f'Имя - {self.first_name},\n '
+                                          f'Фамилия - {self.last_name},\n'
+                                          f'Номер телефона - {self.phone_number},\n'
+                                          f'Адресс Доставки - {self.delivery_address},\n'
+                                          f'Комментарии - {self.description},\n'
+                                          f'Сумма заказа - {self.final_price}',
+                  from_email='djangodixi@gmail.com',
+                  recipient_list=['opiumdlyanaroda3319@gmail.com'])
         super().save(*args, **kwargs)
+        Cart.objects.get(id=self.owner.pk).delete()
 
     def __str__(self):
         return f'Заказ для {self.last_name} {self.first_name}'

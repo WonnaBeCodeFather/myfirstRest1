@@ -108,9 +108,17 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
 }
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'djangodixi@gmail.com'
+EMAIL_HOST_PASSWORD = 'djangodixi3319'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+DEFAULT_FROM_EMAIL = 'opiumdlyanaroda3319@gmail.com'
+EMAIL_ADMIN = 'yuliyashaposhni055@gmail.com'
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 

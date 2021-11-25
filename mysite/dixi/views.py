@@ -32,6 +32,7 @@ class ReviewsView(APIView):
     def get(self, request):
         query = Reviews.objects.all()
         serializer = ReviewsSerializer(query, many=True)
+        print(request.session.session_key)
         return Response(serializer.data)
 
 
@@ -66,8 +67,9 @@ class ReviewUpdateView(generics.RetrieveUpdateDestroyAPIView):
 # User
 class UsersView(APIView):
     """Общее представление пользвателей"""
-
     permission_classes = [permissions.IsAdminUser]
+
+
 
     def get(self, request):
         query = User.objects.all()
@@ -78,50 +80,53 @@ class UsersView(APIView):
 class UsersDetailView(APIView):
     """Детальное представление пользователя"""
 
-    permission_classes = [permissions.IsAdminUser]
-
     def get(self, request, pk):
         query = User.objects.get(id=pk)
         serializer = UsersDetailSerializer(query)
+        print(request.session)
         return Response(serializer.data)
 
 
 # Cart
 class CartView(APIView):
-    """Общее представление всех существующих корзин для авторизованого пользователя"""
+    """Общее представление всех существующих товаров в корзинах для авторизованого пользователя"""
     permission_classes = [permissions.IsAuthenticated]
 
-
     def get(self, request):
-        cart = Cart.objects.filter(owner=request.user)
+        cart = CartProduct.objects.filter(owner=request.user)
         serializer = CartDetailSerializer(cart, many=True)
         return Response(serializer.data)
 
 
 class CartDetailView(APIView):
-    """Детальное представление Корзины"""
+    """Детальное представление товаров корзины"""
 
     def get(self, request, pk):
-        cart = Cart.objects.get(id=pk)
+        cart = CartProduct.objects.get(id=pk)
         serializer = CartDetailSerializer(cart)
         return Response(serializer.data)
 
 
 class CartCreateView(generics.CreateAPIView):
-    """Создание корзины"""
+    """Добавление товаров в корзину. При добавлении товаров в корзину,
+    сперва создается корзина для текущего пользователя, затем уже в неё добавляется товар"""
 
-    queryset = Cart.objects.all()
+    queryset = CartProduct.objects.all()
     serializer_class = CartCreateSerializer
     permission_classes = [OwnerPermission, permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        try:
+            Cart.objects.create(owner=User.objects.get(pk=self.request.user.pk))
+        except:
+            pass
+        serializer.save(owner=Cart.objects.get(owner=self.request.user.pk))
 
 
 class CartUpdateView(generics.UpdateAPIView):
     """Редактирование корзины"""
 
-    queryset = Cart.objects.all()
+    queryset = CartProduct.objects.all()
     serializer_class = CartCreateSerializer
     permission_classes = [OwnerPermission, permissions.IsAuthenticatedOrReadOnly]
 
@@ -129,6 +134,7 @@ class CartUpdateView(generics.UpdateAPIView):
 # Order
 class OrderView(APIView):
     """Общее представление всех существующих заказов"""
+    permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
         order = Order.objects.all()
@@ -138,6 +144,7 @@ class OrderView(APIView):
 
 class OrderDetailView(APIView):
     """Детальное представление заказа"""
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
     def get(self, request, pk):
         order = Order.objects.get(id=pk)
@@ -146,22 +153,19 @@ class OrderDetailView(APIView):
 
 
 class OrderCreateView(generics.CreateAPIView):
-    """Создание корзины"""
+    """Создание заказа и присваивание корзины текущего пользователя к заказу"""
 
     queryset = Order.objects.all()
     serializer_class = OrderCreateSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, OwnerPermission]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save(owner=Cart.objects.get(owner=User.objects.get(pk=self.request.user.pk)))
 
 
 class OrderUpdateView(generics.UpdateAPIView):
-    """Редактирование корзины"""
+    """Редактирование заказа"""
 
     queryset = Order.objects.all()
     serializer_class = OrderCreateSerializer
     permission_classes = [OwnerPermission]
-
-
-

@@ -82,13 +82,13 @@ class CartDetailSerializer(serializers.ModelSerializer):
     products = serializers.SlugRelatedField(slug_field='name', queryset=Product.objects.all())
 
     class Meta:
-        model = Cart
+        model = CartProduct
         fields = '__all__'
 
 
 class CartCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Cart
+        model = CartProduct
         fields = ['products', 'amount']
 
 
