@@ -204,5 +204,3 @@ class OrderUpdateView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderCreateSerializer
     permission_classes = [permissions.IsAdminUser]
-
-

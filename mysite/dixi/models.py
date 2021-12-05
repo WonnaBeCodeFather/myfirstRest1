@@ -1,12 +1,9 @@
 import datetime
-
-from django.http import Http404
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from pytils.translit import slugify
-
 
 
 class Product(models.Model):
@@ -38,10 +35,11 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Модель'
         verbose_name_plural = 'Модели'
-    
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super(Product, self).save(*args, **kwargs)
+
 
 class Category(models.Model):
     name = models.CharField(max_length=50, verbose_name='Имя категории')
@@ -57,7 +55,7 @@ class Category(models.Model):
 
 class Price(models.Model):
     name_model = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Модель',
-                                      related_name='price')
+                                   related_name='price')
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена товара', default=00.00,
                                 )
     discount_bool = models.BooleanField(default=False, verbose_name='Наличие скидки')
@@ -89,8 +87,6 @@ class Price(models.Model):
         verbose_name_plural = 'Цены'
 
 
-
-
 class Material(models.Model):
     name_model = models.CharField(max_length=50, verbose_name='Материал')
 
@@ -100,7 +96,6 @@ class Material(models.Model):
     class Meta:
         verbose_name = 'Материал'
         verbose_name_plural = 'Материал'
-
 
 
 class Gallery(models.Model):
@@ -142,14 +137,15 @@ class Cart(models.Model):
     class Meta:
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзина'
+
     """При создании новой корзины проверяется есть ли корзины созданные 14 дней назад и если они есть, то эти корзины
      удаляются. Это связанно с тем, что корзину для анонимного пользователя я привязал к сессии срок котрой ровно 14 
      дней"""
+
     def save(self, *args, **kwargs):
         now = datetime.datetime.now() - datetime.timedelta(days=1)
         super().save(*args, **kwargs)
         Cart.objects.filter(data_create__lte=now).delete()
-
 
 
 class CartProduct(models.Model):
@@ -230,14 +226,5 @@ class Order(models.Model):
         super().save(*args, **kwargs)
         CartProduct.objects.filter(owner=self.owner.pk).delete()
 
-
-
     def __str__(self):
         return f'Заказ для {self.last_name} {self.first_name}'
-
-
-
-
-
-
-

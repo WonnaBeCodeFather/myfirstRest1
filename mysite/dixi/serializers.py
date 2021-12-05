@@ -38,26 +38,20 @@ class PriceSerializer(serializers.ModelSerializer):
         model = Price
         fields = ['price', 'discount_bool', 'discount', 'new_price']
 
+
 class PriceCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Price
         fields = '__all__'
 
 
-
 class ProductListSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
     material = serializers.SlugRelatedField(slug_field='name_model', read_only=True)
 
-
-
-
     class Meta:
         model = Product
         fields = '__all__'
-
-
-
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -66,7 +60,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     reviews = ReviewsParentSerializer(many=True)
     gender = serializers.CharField(source='get_gender_display')
     season = serializers.CharField(source='get_season_display')
-    price = PriceSerializer()
+    price = PriceSerializer(many=True)
 
     class Meta:
         model = Product
@@ -74,14 +68,10 @@ class ProductDetailSerializer(serializers.ModelSerializer):
                   'gender', 'reviews']
 
 
-
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
-
-
 
 
 # User
@@ -98,9 +88,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 # Cart
-
-
-
 class CartPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Price
@@ -122,6 +109,7 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = '__all__'
 
+
 class CartCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartProduct
@@ -136,8 +124,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
-
-
     class Meta:
         model = Order
         exclude = ['id', 'owner']
@@ -152,9 +138,3 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['first_name', 'last_name', 'phone_number', 'delivery_address', 'description']
-
-
-
-
-
-
