@@ -8,7 +8,7 @@ from .models import *
 class ReviewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reviews
-        fields = '__all__'
+        exclude = ['owner']
 
 
 class FilterReviewsListSerializer(serializers.ListSerializer):
@@ -38,23 +38,50 @@ class PriceSerializer(serializers.ModelSerializer):
         model = Price
         fields = ['price', 'discount_bool', 'discount', 'new_price']
 
+class PriceCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Price
+        fields = '__all__'
+
+
 
 class ProductListSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    material = serializers.SlugRelatedField(slug_field='name_model', read_only=True)
+
+
+
+
     class Meta:
         model = Product
         fields = '__all__'
+
+
+
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
     material = serializers.SlugRelatedField(slug_field='name_model', read_only=True)
     reviews = ReviewsParentSerializer(many=True)
+    gender = serializers.CharField(source='get_gender_display')
+    season = serializers.CharField(source='get_season_display')
     price = PriceSerializer()
 
     class Meta:
         model = Product
         fields = ['id', 'category', 'name', 'price', 'amount', 'material', 'season', 'factory', 'size',
                   'gender', 'reviews']
+
+
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+
 
 
 # User
@@ -71,6 +98,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 # Cart
+
+
+
 class CartPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Price
@@ -78,13 +108,19 @@ class CartPriceSerializer(serializers.ModelSerializer):
 
 
 class CartDetailSerializer(serializers.ModelSerializer):
-    owner = serializers.SlugRelatedField(slug_field='username', read_only=True)
     products = serializers.SlugRelatedField(slug_field='name', queryset=Product.objects.all())
 
     class Meta:
         model = CartProduct
         fields = '__all__'
 
+
+class CartSerializer(serializers.ModelSerializer):
+    product = CartDetailSerializer(many=True)
+
+    class Meta:
+        model = Cart
+        fields = '__all__'
 
 class CartCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -100,14 +136,25 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
-    owner = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
 
     class Meta:
         model = Order
-        exclude = ['cart']
+        exclude = ['id', 'owner']
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['final_price'] = ret['final_price'] + ' грн'
+        return ret
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['first_name', 'last_name', 'phone_number', 'delivery_address', 'description']
+
+
+
+
+
+

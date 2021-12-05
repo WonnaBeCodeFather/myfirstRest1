@@ -19,10 +19,40 @@ class ProductListView(APIView):
 class ProductDetailView(APIView):
     """Описание продукта"""
 
-    def get(self, request, pk):
-        products = Product.objects.get(id=pk)
+    def get(self, request, slug):
+        products = Product.objects.get(slug=slug)
         serializer = ProductDetailSerializer(products)
         return Response(serializer.data)
+
+
+class CategoryCreateView(generics.CreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class CategoryUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class ProductCreateView(generics.CreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductListSerializer
+
+
+class ProductUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductListSerializer
+
+
+class PriceCreateView(generics.CreateAPIView):
+    queryset = Price.objects.all()
+    serializer_class = PriceCreateSerializer
+
+
+class PriceUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Price.objects.all()
+    serializer_class = PriceCreateSerializer
 
 
 # Reviews
@@ -50,7 +80,7 @@ class ReviewCreateView(generics.CreateAPIView):
 
     queryset = Reviews.objects.all()
     serializer_class = ReviewsSerializer
-    permission_classes = [OwnerPermission, permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -69,8 +99,6 @@ class UsersView(APIView):
     """Общее представление пользвателей"""
     permission_classes = [permissions.IsAdminUser]
 
-
-
     def get(self, request):
         query = User.objects.all()
         serializer = UserSerializer(query, many=True)
@@ -83,27 +111,26 @@ class UsersDetailView(APIView):
     def get(self, request, pk):
         query = User.objects.get(id=pk)
         serializer = UsersDetailSerializer(query)
-        print(request.session)
         return Response(serializer.data)
 
 
 # Cart
 class CartView(APIView):
-    """Общее представление всех существующих товаров в корзинах для авторизованого пользователя"""
-    permission_classes = [permissions.IsAuthenticated]
+    """Общее представление всех существующих товаров в корзине пользователя"""
 
     def get(self, request):
-        cart = CartProduct.objects.filter(owner=request.user)
+        if request.user.is_authenticated:
+            cart = CartProduct.objects.filter(owner=Cart.objects.get(owner=request.user))
+        else:
+            cart = CartProduct.objects.filter(owner=Cart.objects.get(id=request.session['cart']))
         serializer = CartDetailSerializer(cart, many=True)
         return Response(serializer.data)
 
 
 class CartDetailView(APIView):
-    """Детальное представление товаров корзины"""
-
     def get(self, request, pk):
-        cart = CartProduct.objects.get(id=pk)
-        serializer = CartDetailSerializer(cart)
+        cart = Cart.objects.get(id=pk)
+        serializer = CartSerializer(cart)
         return Response(serializer.data)
 
 
@@ -113,14 +140,21 @@ class CartCreateView(generics.CreateAPIView):
 
     queryset = CartProduct.objects.all()
     serializer_class = CartCreateSerializer
-    permission_classes = [OwnerPermission, permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [OwnerPermission]
 
     def perform_create(self, serializer):
-        try:
-            Cart.objects.create(owner=User.objects.get(pk=self.request.user.pk))
-        except:
-            pass
-        serializer.save(owner=Cart.objects.get(owner=self.request.user.pk))
+        if self.request.user.is_authenticated:
+            try:
+                Cart.objects.create(owner=User.objects.get(pk=self.request.user.pk))
+            except:
+                pass
+            serializer.save(owner=Cart.objects.get(owner=self.request.user.pk))
+        elif 'cart' not in self.request.session:
+            get_pk = Cart.objects.create().pk
+            obj = serializer.save(owner=Cart.objects.get(id=get_pk))
+            self.request.session['cart'] = get_pk
+        else:
+            serializer.save(owner=Cart.objects.get(id=self.request.session['cart']))
 
 
 class CartUpdateView(generics.UpdateAPIView):
@@ -144,7 +178,6 @@ class OrderView(APIView):
 
 class OrderDetailView(APIView):
     """Детальное представление заказа"""
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
     def get(self, request, pk):
         order = Order.objects.get(id=pk)
@@ -157,15 +190,19 @@ class OrderCreateView(generics.CreateAPIView):
 
     queryset = Order.objects.all()
     serializer_class = OrderCreateSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, OwnerPermission]
+    permission_classes = [OwnerPermission]
 
     def perform_create(self, serializer):
-        serializer.save(owner=Cart.objects.get(owner=User.objects.get(pk=self.request.user.pk)))
+        if self.request.user.is_authenticated:
+            serializer.save(owner=Cart.objects.get(owner=User.objects.get(pk=self.request.user.pk)))
+        else:
+            obj = serializer.save(owner=Cart.objects.get(id=self.request.session['cart']))
+            obj.owner = Cart.objects.get(id=self.request.session['cart'])
 
 
-class OrderUpdateView(generics.UpdateAPIView):
-    """Редактирование заказа"""
-
+class OrderUpdateView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderCreateSerializer
-    permission_classes = [OwnerPermission]
+    permission_classes = [permissions.IsAdminUser]
+
+

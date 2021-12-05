@@ -111,6 +111,15 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'mysite_cash')
+    }
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'djangodixi@gmail.com'
 EMAIL_HOST_PASSWORD = 'djangodixi3319'
