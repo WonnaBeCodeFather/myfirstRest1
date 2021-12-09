@@ -19,7 +19,8 @@ class Product(models.Model):
     name = models.CharField(max_length=100, verbose_name='Наименование модели')
     material = models.ForeignKey('Material', on_delete=models.CASCADE, verbose_name='Матераил')
     category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True, help_text='<font color="red">'
+                                                                          'Поле заполняется автоматически!</font>')
     amount = models.IntegerField(verbose_name='Количество товара', default=0)
     season = models.IntegerField(verbose_name='Сезон', choices=Season.choices)
     factory = models.CharField(max_length=50, verbose_name='Фабрика')
@@ -37,7 +38,8 @@ class Product(models.Model):
         verbose_name_plural = 'Модели'
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        get_name = str(self.name) + str(self.size)
+        self.slug = slugify(get_name)
         super(Product, self).save(*args, **kwargs)
 
 
@@ -217,7 +219,6 @@ class Order(models.Model):
                   from_email='djangodixi@gmail.com',
                   recipient_list=['opiumdlyanaroda3319@gmail.com'])
         for i in CartProduct.objects.filter(owner=self.owner):
-            print(i)
             get_cartproduct = CartProduct.objects.get(id=i.pk).products.pk
             get_cartproduct_amount = CartProduct.objects.get(id=i.pk).amount
             get_product = Product.objects.get(id=get_cartproduct)

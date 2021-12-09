@@ -46,8 +46,8 @@ class PriceCreateSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    material = serializers.SlugRelatedField(slug_field='name_model', read_only=True)
+    category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all())
+    material = serializers.SlugRelatedField(slug_field='name_model', queryset=Material.objects.all())
 
     class Meta:
         model = Product

@@ -148,7 +148,10 @@ class CartCreateView(generics.CreateAPIView):
                 Cart.objects.create(owner=User.objects.get(pk=self.request.user.pk))
             except:
                 pass
-            serializer.save(owner=Cart.objects.get(owner=self.request.user.pk))
+            try:
+                serializer.save(owner=Cart.objects.get(owner=self.request.user.pk))
+            except:
+                pass
         elif 'cart' not in self.request.session:
             get_pk = Cart.objects.create().pk
             obj = serializer.save(owner=Cart.objects.get(id=get_pk))
