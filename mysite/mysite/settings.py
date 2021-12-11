@@ -158,20 +158,22 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'colored': {
+            'format': '[%(asctime)s] - %(levelname)s - %(message)s \n',
+            'datefmt': '%d/%b/%Y %H:%M:%S',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'colored',
         },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
     },
     'loggers': {
-        'django': {
+        'django.db.backends': {
+            'level': 'DEBUG',
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            'propagate': False,
-        },
+        }
     },
 }
