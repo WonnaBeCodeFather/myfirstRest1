@@ -157,7 +157,10 @@ class CartCreateView(generics.CreateAPIView):
             obj = serializer.save(owner=Cart.objects.get(id=get_pk))
             self.request.session['cart'] = get_pk
         else:
-            serializer.save(owner=Cart.objects.get(id=self.request.session['cart']))
+            try:
+                serializer.save(owner=Cart.objects.get(id=self.request.session['cart']))
+            except:
+                pass
 
 
 class CartUpdateView(generics.UpdateAPIView):

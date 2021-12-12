@@ -1,5 +1,7 @@
 import datetime
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -81,12 +83,17 @@ class Price(models.Model):
         else:
             self.new_price = 0.00
             self.discount = 0
-
         super(Price, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Цена'
         verbose_name_plural = 'Цены'
+
+
+@receiver(post_save, sender=Price)
+def testsignal(sender, instance, created, **kwargs):
+    print(instance.name_model)
+    print('Hi')
 
 
 class Material(models.Model):
@@ -169,7 +176,7 @@ class CartProduct(models.Model):
     обуви. Если пользователь добавляет товар в корзину повторно, то он не добавляются"""
 
     def save(self, *args, **kwargs):
-        get_name = Product.objects.get(id=self.products.pk).name
+        get_name = self.products.name
         get_first_id = Product.objects.filter(name=get_name)[0].pk
         if Price.objects.get(name_model=get_first_id).discount_bool:
             self.price = Price.objects.get(name_model=self.products).new_price
@@ -177,7 +184,6 @@ class CartProduct(models.Model):
         else:
             self.price = Price.objects.get(name_model=get_first_id).price
             self.price = self.price * self.amount
-
         if not CartProduct.objects.filter(owner=self.owner):
             super(CartProduct, self).save(*args, **kwargs)
         else:

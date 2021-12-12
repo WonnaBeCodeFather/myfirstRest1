@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'dj_rest_auth.registration',
     'rest_framework.authtoken',
+    'storages',
 
 ]
 SITE_ID = 1
@@ -172,7 +173,7 @@ LOGGING = {
     },
     'loggers': {
         'django.db.backends': {
-            'level': 'DEBUG',
+            'level': 'CRITICAL',
             'handlers': ['console'],
         }
     },
