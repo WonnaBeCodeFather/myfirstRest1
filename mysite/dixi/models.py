@@ -152,7 +152,7 @@ class Cart(models.Model):
      дней"""
 
     def save(self, *args, **kwargs):
-        now = datetime.datetime.now() - datetime.timedelta(days=1)
+        now = datetime.datetime.now() - datetime.timedelta(days=14)
         super().save(*args, **kwargs)
         Cart.objects.filter(data_create__lte=now).delete()
 
