@@ -210,3 +210,8 @@ class OrderUpdateView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderCreateSerializer
     permission_classes = [permissions.IsAdminUser]
+
+
+class GalleryCreateView(generics.CreateAPIView):
+    queryset = Gallery.objects.all()
+    serializer_class = GallerySerializer

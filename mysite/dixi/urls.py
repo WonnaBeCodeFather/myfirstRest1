@@ -34,5 +34,5 @@ urlpatterns = [
     path('order/<int:pk>', views.OrderDetailView.as_view()),
     path('order/<int:pk>/update', views.OrderUpdateView.as_view()),
 
-
+    path('gallery/create/', views.GalleryCreateView.as_view()),
 ]
