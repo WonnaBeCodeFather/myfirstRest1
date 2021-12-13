@@ -4,3 +4,5 @@
 /mysite/dixi/__pycache__/
 /mysite/__pycache__/
 /mysite/static/
+/mysite/db.sqlite3
+
