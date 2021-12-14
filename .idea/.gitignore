@@ -1,3 +1,11 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+/mysite/.env
+/mysite/media/
+/mysite/dixi/media/
+/mysite/dixi/__pycache__/
+/mysite/__pycache__/
+/mysite/static/
+/mysite/db.sqlite3
+
