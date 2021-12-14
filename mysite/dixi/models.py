@@ -93,7 +93,7 @@ class Price(models.Model):
 @receiver(post_save, sender=Price)
 def testsignal(sender, instance, created, **kwargs):
     print(instance.name_model)
-    print('Закомитьменяполностью')
+    print('Комитьменя')
 
 
 class Material(models.Model):
