@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c8614987-167f-4d99-bc75-3ddd652a7247" name="Changes" comment="Добавлены переменные среды" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--follow-tags" />
+        <option name="title" value="Current Branch" />
+      </GitPushTagMode>
+    </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Юля-сюда" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/mysite/dixi/models.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/mysite/dixi/serializers.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/mysite/dixi/views.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/mysite/dixi/permissions.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/mysite/dixi/urls.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/mysite/dixi/__init__.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/mysite/mysite/settings.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectId" id="200EXzBNGnvyj5k7QNac2FP8tcL" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ChangesTree.GroupingKeys" value="" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/mysite/manage.py" />
+    <property name="settings.editor.selected.configurable" value="reference.settings.ide.settings.notifications" />
+  </component>
+  <component name="RunManager" selected="Python.manage">
+    <configuration name="manage" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="D:\myfirstRest\venv\Scripts\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/mysite" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/mysite/manage.py" />
+      <option name="PARAMETERS" value="runserver" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="myfirstRest" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/mysite/dixi" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/mysite/dixi/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.manage" />
+      <item itemvalue="Python.test" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.test" />
+        <item itemvalue="Python.test" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c8614987-167f-4d99-bc75-3ddd652a7247" name="Changes" comment="" />
+      <created>1635173149305</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1635173149305</updated>
+    </task>
+    <task id="LOCAL-00001" summary="as">
+      <created>1636303460150</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1636303460151</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Добавлена регистрация, аунтификация через dj_rest_auth.">
+      <created>1636396830889</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1636396830889</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Добавлены permissions. Cоздавать отзывы может только авторизованый пользователь. Неавторизованый пользователь может только просматривать отзывы. Редактировать отзывы может только тот кто их оставил&#10;либо же админ. Переделал CRUD для отзывов использовал generic дабы реализовать кастомный permission использовав perform_create(как это сделать через APIView я не понял) &#10;12 часов пота а потом экстаз...">
+      <created>1636536658238</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1636536658238</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Создана корзина, Автоизация, сейчас буду ронять базу">
+      <created>1636966594203</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1636966594203</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Доделана корзина и оформление заказа, исправлены баги">
+      <created>1636995362860</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1636995362860</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Доделана корзина и оформление заказа, исправлены баги">
+      <created>1637866326732</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1637866326733</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Доделана корзина и оформление заказа, исправлены баги">
+      <created>1638730313257</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1638730313257</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Доделана корзина и оформление заказа, исправлены баги">
+      <created>1638731166641</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1638731166641</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Найдена и устранена пачка багов">
+      <created>1639078462789</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1639078462789</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Найдена и устранена пачка багов">
+      <created>1639078604753</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1639078604753</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Найдена и устранена пачка багов">
+      <created>1639227907217</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1639227907217</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Добавлено логирование SQL запросов">
+      <created>1639314064461</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1639314064461</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Добавлено логирование SQL запросов">
+      <created>1639314367085</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1639314367085</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Добавлены переменные среды">
+      <created>1639424313188</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1639424313188</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Добавлены переменные среды">
+      <created>1639425527424</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1639425527424</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Добавлены переменные среды">
+      <created>1639425695340</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1639425695340</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Добавлены переменные среды">
+      <created>1639501628806</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1639501628806</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Добавлены переменные среды">
+      <created>1639502154378</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1639502154378</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Добавлены переменные среды">
+      <created>1639502315858</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1639502315858</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Добавлены переменные среды">
+      <created>1639502684108</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1639502684108</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Добавлены переменные среды">
+      <created>1639502786753</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1639502786753</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Добавлены переменные среды">
+      <created>1639508847194</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1639508847194</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Добавлены переменные среды">
+      <created>1639510192105</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1639510192105</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Добавлены переменные среды">
+      <created>1641218768951</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1641218768951</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="as" />
+    <MESSAGE value="Добавлена регистрация, аунтификация через dj_rest_auth." />
+    <MESSAGE value="Добавлены permissions. Cоздавать отзывы может только авторизованый пользователь. Неавторизованый пользователь может только просматривать отзывы. Редактировать отзывы может только тот кто их оставил&#10;либо же админ. Переделал CRUD для отзывов использовал generic дабы реализовать кастомный permission использовав perform_create(как это сделать через APIView я не понял) &#10;12 часов пота а потом экстаз..." />
+    <MESSAGE value="Создана корзина, Автоизация, сейчас буду ронять базу" />
+    <MESSAGE value="Доделана корзина и оформление заказа, исправлены баги" />
+    <MESSAGE value="Найдена и устранена пачка багов" />
+    <MESSAGE value="Добавлено логирование SQL запросов" />
+    <MESSAGE value="Добавлены переменные среды" />
+    <option name="LAST_COMMIT_MESSAGE" value="Добавлены переменные среды" />
+  </component>
+</project>
