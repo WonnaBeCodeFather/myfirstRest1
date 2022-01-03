@@ -26,7 +26,6 @@ class Product(models.Model):
     amount = models.IntegerField(verbose_name='Количество товара', default=0)
     season = models.IntegerField(verbose_name='Сезон', choices=Season.choices)
     factory = models.CharField(max_length=50, verbose_name='Фабрика')
-    size = models.IntegerField(verbose_name='Размер обуви', default=36)
     gender = models.IntegerField(verbose_name='Пол', choices=Gender.choices)
 
     def __str__(self):
@@ -43,6 +42,10 @@ class Product(models.Model):
         get_name = str(self.name) + str(self.size)
         self.slug = slugify(get_name)
         super(Product, self).save(*args, **kwargs)
+
+class Size(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, verbose_name='Наименование модели', null=True)
+    size = models.PositiveIntegerField(default=36)
 
 
 class Category(models.Model):
