@@ -4,6 +4,7 @@ from rest_framework import permissions, status
 from .permissions import OwnerPermission
 from .serializers import *
 from .services import *
+from django.db import transaction
 
 
 # Products
@@ -30,7 +31,7 @@ class CategoryCreateView(APIView):
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=202)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors)
 
 
@@ -38,10 +39,21 @@ class CategoryUpdateView(APIView):
     def put(self, request, pk):
         snippet = Category.objects.get(id=pk)
         data = request.data
-        snippet.product = data['name']
+        snippet.name = data['name']
         snippet.save()
         serializer = CategorySerializer(snippet)
         return Response(serializer.data)
+
+
+class MaterialCreateView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request):
+        serializer = MaterialSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors)
 
 
 # class ProductCreateView(APIView):
@@ -58,7 +70,7 @@ class ProductUpdateView(APIView):
         queryset = Product.objects.get(id=pk)
         data = request.data
         if 'title' in data:
-            queryset.product = data['title']
+            queryset.name = data['title']
         if 'season' in data:
             queryset.season = data['season']
         if 'factory' in data:
@@ -255,6 +267,7 @@ class OrderDetailView(APIView):
         return Response(serializer.data)
 
 
+@transaction.atomic
 class OrderCreateView(APIView):
     permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 

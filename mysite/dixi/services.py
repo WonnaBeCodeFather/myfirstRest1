@@ -1,12 +1,13 @@
 from .models import Price, Cart, CartProduct, OrderDetail, Category, Product, Material
 from django.core.mail import send_mail
+from django.db import transaction
 
 
 class PriceService:
     def __init__(self, product=None):
         if product:
             self.product = product
-            self.get_product_price = Price.objects.get(name_model=product)
+            self.get_product_price = Price.objects.get(product=product)
 
     # @staticmethod
     # def discount_price(price, discount):
@@ -30,13 +31,13 @@ class CartProductService:
         self.cart_queryset_user = Cart.objects.get_or_create(owner=self.user)[0]
 
     def check_duplicate_product_in_cart(self, product):
-        get_cartproduct_list = CartProduct.objects.filter(products=product, owner=self.cart_queryset_user)
+        get_cartproduct_list = CartProduct.objects.filter(product=product, owner=self.cart_queryset_user)
         if not get_cartproduct_list:
             return True
         return False
 
     def duplicate_finded(self, product, amount):
-        get_product_in_cartproduct = CartProduct.objects.get(products=product, owner=self.cart_queryset_user)
+        get_product_in_cartproduct = CartProduct.objects.get(product=product, owner=self.cart_queryset_user)
         get_product_in_cartproduct.amount = get_product_in_cartproduct.amount + amount
         get_product_in_cartproduct.price = get_product_in_cartproduct.price + PriceService(product).get_total_price(
             amount)
@@ -81,6 +82,7 @@ class SuperService:
     def __init__(self, data):
         self.data = data
 
+    @transaction.atomic
     def main(self):
         SuperService(self.data).create_product()
 
@@ -88,7 +90,6 @@ class SuperService:
         get_material = Material.objects.get(id=self.data['material'])
         get_category = Category.objects.get(id=self.data['category'])
         product = Product.objects.create(title=self.data['title'],
-                                         slug=self.data['slug'],
                                          season=self.data['season'],
                                          factory=self.data['factory'],
                                          gender=self.data['gender'],
@@ -103,7 +104,7 @@ class SuperService:
                                                               * float(self.data['price']['discount']))
             set_new_price = new_price
 
-        price = Price.objects.create(name_model=product,
+        price = Price.objects.create(product=product,
                                      price=self.data['price']['price'],
                                      discount=self.data['price']['discount'],
                                      new_price=set_new_price)

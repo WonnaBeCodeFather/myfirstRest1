@@ -164,6 +164,7 @@ class MaterialSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+
 class SuperPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Price
@@ -175,5 +176,4 @@ class SuperSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['title', 'slug', 'season', 'factory', 'gender', 'category', 'material', 'price']
-
+        fields = ['title', 'season', 'factory', 'gender', 'category', 'material', 'price']

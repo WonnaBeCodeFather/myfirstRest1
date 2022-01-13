@@ -16,7 +16,7 @@ class Product(models.Model):
         winter = 3, 'Зима'
 
     title = models.CharField(max_length=100, verbose_name='Наименование модели')
-    material = models.ForeignKey('Material', on_delete=models.CASCADE, verbose_name='Матераил')
+    material = models.ForeignKey('Material', on_delete=models.CASCADE, verbose_name='Матераил', related_name='material')
     category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
     slug = models.SlugField(unique=True, blank=True, null=True, help_text='<font color="red">'
                                                                             'Поле заполняется автоматически!</font>')
@@ -25,7 +25,7 @@ class Product(models.Model):
     gender = models.IntegerField(verbose_name='Пол', choices=Gender.choices)
 
     def __str__(self):
-        return self.name
+        return self.title
 
     def get_absolute_url(self):
         return reverse('post', kwargs={'post_id': self.pk})
@@ -35,7 +35,7 @@ class Product(models.Model):
         verbose_name_plural = 'Модели'
 
     def save(self, *args, **kwargs):
-        get_name = str(self.name)
+        get_name = str(self.title)
         self.slug = slugify(get_name)
         super(Product, self).save(*args, **kwargs)
 
@@ -86,10 +86,10 @@ class Price(models.Model):
 
 
 class Material(models.Model):
-    product = models.CharField(max_length=50, verbose_name='Материал')
+    name = models.CharField(max_length=50, verbose_name='Материал')
 
     def __str__(self):
-        return self.product
+        return self.name
 
     class Meta:
         verbose_name = 'Материал'
@@ -145,7 +145,7 @@ class CartProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукты в корзине')
     amount = models.PositiveIntegerField(default=1, verbose_name='Количество товара')
     price = models.DecimalField(decimal_places=2, max_digits=7, blank=True, verbose_name='Общая Цена')
-    size = models.ForeignKey(Size, on_delete=models.CASCADE, verbose_name='Размер продукта')
+    size = models.ForeignKey(Size, on_delete=models.CASCADE, verbose_name='Размер продукта', related_name='sizes')
 
     class Meta:
         verbose_name = 'Товар в корзине'
