@@ -5,12 +5,15 @@ from . import views
 urlpatterns = [
     path('category/create', views.CategoryCreateView.as_view()),
     path('category/<int:pk>/update', views.CategoryUpdateView.as_view()),
-    path('product/create', views.ProductCreateView.as_view()),
+    #path('product/create', views.ProductCreateView.as_view()),
     path('product/<int:pk>/update', views.ProductUpdateView.as_view()),
-    path('price/create', views.PriceCreateView.as_view()),
+    path('size/create', views.SizeCreateView.as_view()),
+    path('size/<int:pk>/', views.SizeUpdateView.as_view()),
+    #path('price/create', views.PriceCreateView.as_view()),
     path('price/<int:pk>/update', views.PriceUpdateView.as_view()),
     path('product/', views.ProductListView.as_view()),
     path('product/<slug:slug>/', views.ProductDetailView.as_view()),
+    path('superview/', views.SuperView.as_view()),
 
 
     path('reviews/create/', views.ReviewCreateView.as_view()),

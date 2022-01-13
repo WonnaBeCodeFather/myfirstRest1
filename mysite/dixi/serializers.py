@@ -36,7 +36,7 @@ class ReviewsParentSerializer(serializers.ModelSerializer):
 class PriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Price
-        fields = ['price', 'discount_bool', 'discount', 'new_price']
+        fields = ['price', 'discount', 'new_price']
 
 
 class PriceCreateSerializer(serializers.ModelSerializer):
@@ -54,6 +54,18 @@ class ProductListSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ProductCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+
+class SizeCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Size
+        fields = '__all__'
+
+
 class ProductDetailSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
     material = serializers.SlugRelatedField(slug_field='name_model', read_only=True)
@@ -64,7 +76,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'category', 'name', 'price', 'amount', 'material', 'season', 'factory', 'size',
+        fields = ['id', 'category', 'name', 'price', 'material', 'season', 'factory',
                   'gender', 'reviews']
 
 
@@ -113,7 +125,7 @@ class CartSerializer(serializers.ModelSerializer):
 class CartCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartProduct
-        fields = ['products', 'amount']
+        fields = '__all__'
 
 
 # Order
@@ -144,3 +156,24 @@ class GallerySerializer(serializers.ModelSerializer):
     class Meta:
         model = Gallery
         fields = '__all__'
+
+
+class MaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Material
+        fields = "__all__"
+
+
+class SuperPriceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Price
+        fields = ['price', 'discount']
+
+
+class SuperSerializer(serializers.ModelSerializer):
+    price = SuperPriceSerializer()
+
+    class Meta:
+        model = Product
+        fields = ['title', 'slug', 'season', 'factory', 'gender', 'category', 'material', 'price']
+

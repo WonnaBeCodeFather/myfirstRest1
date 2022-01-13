@@ -1,14 +1,14 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import permissions
+from rest_framework import permissions, status
 from .permissions import OwnerPermission
 from .serializers import *
-from rest_framework import generics
+from .services import *
 
 
 # Products
 class ProductListView(APIView):
-    """Общее описание продукции"""
+    """Get all products"""
 
     def get(self, request):
         products = Product.objects.all()
@@ -17,7 +17,7 @@ class ProductListView(APIView):
 
 
 class ProductDetailView(APIView):
-    """Описание продукта"""
+    """Get one product"""
 
     def get(self, request, slug):
         products = Product.objects.get(slug=slug)
@@ -25,49 +25,111 @@ class ProductDetailView(APIView):
         return Response(serializer.data)
 
 
-class CategoryCreateView(generics.CreateAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class CategoryCreateView(APIView):
+    def post(self, request):
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=202)
+        return Response(serializer.errors)
 
 
-class CategoryUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class CategoryUpdateView(APIView):
+    def put(self, request, pk):
+        snippet = Category.objects.get(id=pk)
+        data = request.data
+        snippet.product = data['name']
+        snippet.save()
+        serializer = CategorySerializer(snippet)
+        return Response(serializer.data)
 
 
-class ProductCreateView(generics.CreateAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductListSerializer
+# class ProductCreateView(APIView):
+#     def post(self, request):
+#         serializer = ProductCreateSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors)
 
 
-class ProductUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductListSerializer
+class ProductUpdateView(APIView):
+    def put(self, request, pk):
+        queryset = Product.objects.get(id=pk)
+        data = request.data
+        if 'title' in data:
+            queryset.product = data['title']
+        if 'season' in data:
+            queryset.season = data['season']
+        if 'factory' in data:
+            queryset.factory = data['factory']
+        if 'slug' in data:
+            queryset.slug = data['slug']
+        queryset.save()
+        serializer = ProductListSerializer(queryset)
+        return Response(serializer.data)
 
 
-class PriceCreateView(generics.CreateAPIView):
-    queryset = Price.objects.all()
-    serializer_class = PriceCreateSerializer
+class SizeCreateView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request):
+        serializer = SizeCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors)
 
 
-class PriceUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Price.objects.all()
-    serializer_class = PriceCreateSerializer
+class SizeUpdateView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def put(self, request, pk):
+        queryset = Size.objects.get(id=pk)
+        data = request.data
+        queryset.amount = data['amount']
+        queryset.save()
+        serializer = SizeCreateSerializer(queryset)
+        return Response(serializer.data)
+
+
+# Price
+# class PriceCreateView(APIView):
+#     def post(self, request):
+#         data = request.data
+#         serializer = PriceCreateSerializer(data=data)
+#         if serializer.is_valid():
+#             instance = serializer.save()
+#             instance.new_price = PriceService().discount_price(instance.price, instance.discount)
+#             instance.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors)
+
+
+class PriceUpdateView(APIView):
+    def put(self, request, pk):
+        queryset = PriceService(pk).get_product_price
+        data = request.data
+        if 'price' in data:
+            queryset.price = data['price']
+        if 'discount' in data:
+            queryset.discount = data['discount']
+        queryset.new_price = PriceService(pk).discount_price(queryset.price, queryset.discount)
+        queryset.save()
+        serializer = PriceCreateSerializer(queryset)
+        return Response(serializer.data)
 
 
 # Reviews
 class ReviewsView(APIView):
-    """Все отзывы"""
 
     def get(self, request):
         query = Reviews.objects.all()
         serializer = ReviewsSerializer(query, many=True)
-        print(request.session.session_key)
         return Response(serializer.data)
 
 
 class ReviewsDetailView(APIView):
-    """Вывод отзыва"""
 
     def get(self, request, pk):
         query = Reviews.objects.get(id=pk)
@@ -75,28 +137,36 @@ class ReviewsDetailView(APIView):
         return Response(serializer.data)
 
 
-class ReviewCreateView(generics.CreateAPIView):
-    """"Создание комментария"""
-
-    queryset = Reviews.objects.all()
-    serializer_class = ReviewsSerializer
+class ReviewCreateView(APIView):
     permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    def post(self, request):
+        serializer = ReviewsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(owner=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors)
 
 
-class ReviewUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    """CRUD Комментариев"""
+class ReviewUpdateView(APIView):
+    permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
-    queryset = Reviews.objects.all()
-    serializer_class = ReviewsSerializer
-    permission_classes = [OwnerPermission]
+    def put(self, request, pk):
+        queryset = Reviews.objects.get(id=pk)
+        data = request.data
+        queryset.text = data['text']
+        queryset.save()
+        serializer = ReviewsSerializer(queryset)
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        queryset = Reviews.objects.get(id=pk)
+        queryset.delete()
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 # User
 class UsersView(APIView):
-    """Общее представление пользвателей"""
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
@@ -106,7 +176,6 @@ class UsersView(APIView):
 
 
 class UsersDetailView(APIView):
-    """Детальное представление пользователя"""
 
     def get(self, request, pk):
         query = User.objects.get(id=pk)
@@ -116,7 +185,6 @@ class UsersDetailView(APIView):
 
 # Cart
 class CartView(APIView):
-    """Общее представление всех существующих товаров в корзине пользователя"""
 
     def get(self, request):
         if request.user.is_authenticated:
@@ -134,46 +202,43 @@ class CartDetailView(APIView):
         return Response(serializer.data)
 
 
-class CartCreateView(generics.CreateAPIView):
-    """Добавление товаров в корзину. При добавлении товаров в корзину,
-    сперва создается корзина для текущего пользователя, затем уже в неё добавляется товар"""
+class CartCreateView(APIView):
+    permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
-    queryset = CartProduct.objects.all()
-    serializer_class = CartCreateSerializer
-    permission_classes = [OwnerPermission]
-
-    def perform_create(self, serializer):
-        if self.request.user.is_authenticated:
-            try:
-                Cart.objects.create(owner=User.objects.get(pk=self.request.user.pk))
-            except:
-                pass
-            try:
-                serializer.save(owner=Cart.objects.get(owner=self.request.user.pk))
-            except:
-                pass
-        elif 'cart' not in self.request.session:
-            get_pk = Cart.objects.create().pk
-            obj = serializer.save(owner=Cart.objects.get(id=get_pk))
-            self.request.session['cart'] = get_pk
+    def post(self, request):
+        serializer = CartCreateSerializer(data=request.data)
+        data = request.data
+        CartProductService(request.user)
+        if CartProductService(request.user).check_duplicate_product_in_cart(data['product']):
+            if serializer.is_valid():
+                instance = serializer.save(price=PriceService(data['product']).get_total_price(data['amount']))
+                instance.owner = CartProductService(request.user).cart_queryset_user
+                instance.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            try:
-                serializer.save(owner=Cart.objects.get(id=self.request.session['cart']))
-            except:
-                pass
+            CartProductService(request.user).duplicate_finded(data['product'], data['amount'])
+        return Response(serializer.errors)
 
 
-class CartUpdateView(generics.UpdateAPIView):
-    """Редактирование корзины"""
+class CartUpdateView(APIView):
+    permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
-    queryset = CartProduct.objects.all()
-    serializer_class = CartCreateSerializer
-    permission_classes = [OwnerPermission, permissions.IsAuthenticatedOrReadOnly]
+    def put(self, request, pk):
+        queryset = CartProduct.objects.get(id=pk)
+        data = request.data
+        queryset.amount = data['amount']
+        queryset.save()
+        serializer = CartCreateSerializer(queryset)
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        queryset = CartProduct.objects.get(id=pk)
+        queryset.delete()
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 # Order
 class OrderView(APIView):
-    """Общее представление всех существующих заказов"""
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
@@ -183,7 +248,6 @@ class OrderView(APIView):
 
 
 class OrderDetailView(APIView):
-    """Детальное представление заказа"""
 
     def get(self, request, pk):
         order = Order.objects.get(id=pk)
@@ -191,27 +255,55 @@ class OrderDetailView(APIView):
         return Response(serializer.data)
 
 
-class OrderCreateView(generics.CreateAPIView):
-    """Создание заказа и присваивание корзины текущего пользователя к заказу"""
+class OrderCreateView(APIView):
+    permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
-    queryset = Order.objects.all()
-    serializer_class = OrderCreateSerializer
-    permission_classes = [OwnerPermission]
+    def post(self, request):
+        serializer = OrderCreateSerializer(data=request.data)
 
-    def perform_create(self, serializer):
-        if self.request.user.is_authenticated:
-            serializer.save(owner=Cart.objects.get(owner=User.objects.get(pk=self.request.user.pk)))
-        else:
-            obj = serializer.save(owner=Cart.objects.get(id=self.request.session['cart']))
-            obj.owner = Cart.objects.get(id=self.request.session['cart'])
+        if serializer.is_valid():
+            instance = serializer.save(owner=CartProductService(request.user).cart_queryset_user)
+            instance.final_price = OrderService(request.user).get_total_price_all_cartproduct()
+            instance.save()
+            OrderService(request.user).set_order_for_order_product(instance)
+            OrderService(request.user).send_mail_after_order(instance)
+            CartProductService(request.user).clean_cartproduct()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors)
 
 
-class OrderUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderCreateSerializer
+class OrderUpdateView(APIView):
     permission_classes = [permissions.IsAdminUser]
 
+    def put(self, request, pk):
+        queryset = Order.objects.get(id=pk)
+        data = request.data
+        queryset.first_name = data['first_name']
+        queryset.last_name = data['last_name']
+        queryset.phone_number = data['phone_number']
+        queryset.delivery_address = data['delivery_address']
+        queryset.save()
+        serializer = OrderCreateSerializer(queryset)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class GalleryCreateView(generics.CreateAPIView):
-    queryset = Gallery.objects.all()
-    serializer_class = GallerySerializer
+
+class GalleryCreateView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request):
+        serializer = GallerySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors)
+
+
+class SuperView(APIView):
+
+    def post(self, request):
+        data = request.data
+        product_serializer = SuperSerializer(data=data)
+        if product_serializer.is_valid():
+            SuperService(data).main()
+            return Response(product_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(product_serializer.errors)
