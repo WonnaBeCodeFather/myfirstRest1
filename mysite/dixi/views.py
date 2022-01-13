@@ -267,7 +267,7 @@ class OrderDetailView(APIView):
         return Response(serializer.data)
 
 
-@transaction.atomic
+
 class OrderCreateView(APIView):
     permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
