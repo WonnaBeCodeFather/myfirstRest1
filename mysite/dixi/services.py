@@ -9,15 +9,14 @@ class PriceService:
             self.product = product
             self.get_product_price = Price.objects.get(product=product)
 
-    # @staticmethod
-    # def discount_price(price, discount):
-    #     if discount:
-    #         new_price = float(price) - ((float(price) / 100) * float(discount))
-    #         new_price = new_price
-    #         return new_price
-    #     else:
-    #         new_price = 0
-    #         return new_price
+    @staticmethod
+    def discount_price(price, discount):
+        if discount:
+            new_price = float(price) - ((float(price) / 100) * float(discount))
+            return new_price
+        else:
+            new_price = 0
+            return new_price
 
     def get_total_price(self, amount):
         if self.get_product_price.new_price:

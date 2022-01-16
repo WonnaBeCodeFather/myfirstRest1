@@ -4,7 +4,7 @@ from rest_framework import permissions, status
 from .permissions import OwnerPermission
 from .serializers import *
 from .services import *
-from django.db import transaction
+
 
 
 # Products
@@ -27,6 +27,10 @@ class ProductDetailView(APIView):
 
 
 class CategoryCreateView(APIView):
+    """Create category"""
+
+    permission_classes = [permissions.IsAdminUser]
+
     def post(self, request):
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
@@ -36,16 +40,22 @@ class CategoryCreateView(APIView):
 
 
 class CategoryUpdateView(APIView):
+    """Update category"""
+
+    permission_classes = [permissions.IsAdminUser]
+
     def put(self, request, pk):
-        snippet = Category.objects.get(id=pk)
+        queryset = Category.objects.get(id=pk)
         data = request.data
-        snippet.name = data['name']
-        snippet.save()
-        serializer = CategorySerializer(snippet)
+        queryset.name = data['name']
+        queryset.save()
+        serializer = CategorySerializer(queryset)
         return Response(serializer.data)
 
 
 class MaterialCreateView(APIView):
+    """Create Material"""
+
     permission_classes = [permissions.IsAdminUser]
 
     def post(self, request):
@@ -66,6 +76,13 @@ class MaterialCreateView(APIView):
 
 
 class ProductUpdateView(APIView):
+    """
+    Update product. You can change any fields
+    from this list: ["title", "season", "factory", "slug"]
+    """
+
+    permission_classes = [permissions.IsAdminUser]
+
     def put(self, request, pk):
         queryset = Product.objects.get(id=pk)
         data = request.data
@@ -83,6 +100,8 @@ class ProductUpdateView(APIView):
 
 
 class SizeCreateView(APIView):
+    """"Create size, amount for the product"""
+
     permission_classes = [permissions.IsAdminUser]
 
     def post(self, request):
@@ -94,6 +113,8 @@ class SizeCreateView(APIView):
 
 
 class SizeUpdateView(APIView):
+    """Update amount for the product"""
+
     permission_classes = [permissions.IsAdminUser]
 
     def put(self, request, pk):
@@ -119,14 +140,20 @@ class SizeUpdateView(APIView):
 
 
 class PriceUpdateView(APIView):
+    """"
+    Update price for the product.
+    You can change any fields on this list: "discount", "price".
+    If you cheng field "discount" field "new_price" will change automatically.
+    """
+
     def put(self, request, pk):
-        queryset = PriceService(pk).get_product_price
+        queryset = Price.objects.get(id=pk)
         data = request.data
         if 'price' in data:
             queryset.price = data['price']
         if 'discount' in data:
             queryset.discount = data['discount']
-        queryset.new_price = PriceService(pk).discount_price(queryset.price, queryset.discount)
+        queryset.new_price = PriceService().discount_price(queryset.price, queryset.discount)
         queryset.save()
         serializer = PriceCreateSerializer(queryset)
         return Response(serializer.data)
@@ -134,6 +161,7 @@ class PriceUpdateView(APIView):
 
 # Reviews
 class ReviewsView(APIView):
+    """Get all Reviews"""
 
     def get(self, request):
         query = Reviews.objects.all()
@@ -142,6 +170,7 @@ class ReviewsView(APIView):
 
 
 class ReviewsDetailView(APIView):
+    """Get one Review"""
 
     def get(self, request, pk):
         query = Reviews.objects.get(id=pk)
@@ -150,6 +179,11 @@ class ReviewsDetailView(APIView):
 
 
 class ReviewCreateView(APIView):
+    """
+    Create Review. After created review to the field "owner" assigned the user
+    who created the comment.
+    """
+
     permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
     def post(self, request):
@@ -161,6 +195,9 @@ class ReviewCreateView(APIView):
 
 
 class ReviewUpdateView(APIView):
+    """
+    Update Review. Only the person who created comment can edit it.
+    """
     permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
     def put(self, request, pk):
@@ -179,6 +216,10 @@ class ReviewUpdateView(APIView):
 
 # User
 class UsersView(APIView):
+    """
+    Get Users list
+    """
+
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
@@ -188,6 +229,9 @@ class UsersView(APIView):
 
 
 class UsersDetailView(APIView):
+    """
+    Get Detail User
+    """
 
     def get(self, request, pk):
         query = User.objects.get(id=pk)
@@ -196,25 +240,31 @@ class UsersDetailView(APIView):
 
 
 # Cart
-class CartView(APIView):
+# class CartView(APIView):
+#
+#     def get(self, request):
+#         if request.user.is_authenticated:
+#             cart = CartProduct.objects.filter(owner=Cart.objects.get(owner=request.user))
+#         else:
+#             cart = CartProduct.objects.filter(owner=Cart.objects.get(id=request.session['cart']))
+#         serializer = CartDetailSerializer(cart, many=True)
+#         return Response(serializer.data)
 
-    def get(self, request):
-        if request.user.is_authenticated:
-            cart = CartProduct.objects.filter(owner=Cart.objects.get(owner=request.user))
-        else:
-            cart = CartProduct.objects.filter(owner=Cart.objects.get(id=request.session['cart']))
-        serializer = CartDetailSerializer(cart, many=True)
-        return Response(serializer.data)
 
-
-class CartDetailView(APIView):
-    def get(self, request, pk):
-        cart = Cart.objects.get(id=pk)
-        serializer = CartSerializer(cart)
-        return Response(serializer.data)
+# class CartDetailView(APIView):
+#     def get(self, request, pk):
+#         cart = Cart.objects.get(id=pk)
+#         serializer = CartSerializer(cart)
+#         return Response(serializer.data)
 
 
 class CartCreateView(APIView):
+    """
+    After adding an item to the cart. First, a shopping cart is created, then the goods are placed in it.
+    If the user adds an already existing product to the cart, then the quality of the product is increased by 1.
+    The price increases as the amount of items in the cart increases.
+    """
+
     permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
     def post(self, request):
@@ -233,6 +283,11 @@ class CartCreateView(APIView):
 
 
 class CartUpdateView(APIView):
+    """
+    Update CartProduct.
+    When editing a cart, only one field is available - "amount".
+    """
+
     permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
     def put(self, request, pk):
@@ -251,6 +306,10 @@ class CartUpdateView(APIView):
 
 # Order
 class OrderView(APIView):
+    """
+    Show Orders List.
+    """
+
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
@@ -260,6 +319,11 @@ class OrderView(APIView):
 
 
 class OrderDetailView(APIView):
+    """
+    Detail view of one order.
+    """
+
+    permission_classes = [permissions.IsAdminUser]
 
     def get(self, request, pk):
         order = Order.objects.get(id=pk)
@@ -267,8 +331,15 @@ class OrderDetailView(APIView):
         return Response(serializer.data)
 
 
-
 class OrderCreateView(APIView):
+    """
+    Create Order.
+    When placing an order, the total amount of all items in the cart is calculated.
+    Data with the contents of the order is sent to the seller's mail.
+    An entity is also created in the database in which data about the purchased product,
+    its size and quantity are placed.
+    Then the entire contents of the basket are cleared.
+    """
     permission_classes = [OwnerPermission, permissions.IsAuthenticated]
 
     def post(self, request):
@@ -286,21 +357,36 @@ class OrderCreateView(APIView):
 
 
 class OrderUpdateView(APIView):
+    """
+    Edit Order.
+    When editing an order, you can change the following fields: "first_name", "last_name", "phone_number",
+    "delivery_address", "description".
+    """
+
     permission_classes = [permissions.IsAdminUser]
 
     def put(self, request, pk):
         queryset = Order.objects.get(id=pk)
         data = request.data
-        queryset.first_name = data['first_name']
-        queryset.last_name = data['last_name']
-        queryset.phone_number = data['phone_number']
-        queryset.delivery_address = data['delivery_address']
+        if 'first_name' in data:
+            queryset.first_name = data['first_name']
+        if 'last_name' in data:
+            queryset.last_name = data['last_name']
+        if 'phone_number' in data:
+            queryset.phone_number = data['phone_number']
+        if 'delivery_address' in data:
+            queryset.delivery_address = data['delivery_address']
+        if 'description' in data:
+            queryset.delivery_address = data['description']
         queryset.save()
         serializer = OrderCreateSerializer(queryset)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class GalleryCreateView(APIView):
+    """
+    Adding an image to a product.
+    """
     permission_classes = [permissions.IsAdminUser]
 
     def post(self, request):

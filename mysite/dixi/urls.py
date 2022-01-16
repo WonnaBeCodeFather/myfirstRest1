@@ -29,8 +29,8 @@ urlpatterns = [
 
     path('cart/create/', views.CartCreateView.as_view()),
     path('cart/<int:pk>/update', views.CartUpdateView.as_view()),
-    path('cart/', views.CartView.as_view()),
-    path('cart/<int:pk>', views.CartDetailView.as_view()),
+    # path('cart/', views.CartView.as_view()),
+    # path('cart/<int:pk>', views.CartDetailView.as_view()),
 
 
     path('order/create/', views.OrderCreateView.as_view()),
