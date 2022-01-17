@@ -6,8 +6,10 @@ from .serializers import *
 from .services import *
 
 
-
 # Products
+
+
+
 class ProductListView(APIView):
     """Get all products"""
 
@@ -153,7 +155,7 @@ class PriceUpdateView(APIView):
             queryset.price = data['price']
         if 'discount' in data:
             queryset.discount = data['discount']
-        queryset.new_price = PriceService().discount_price(queryset.price, queryset.discount)
+        queryset.new_price = Discount(queryset.price, queryset.discount).discount_price()
         queryset.save()
         serializer = PriceCreateSerializer(queryset)
         return Response(serializer.data)
@@ -270,15 +272,16 @@ class CartCreateView(APIView):
     def post(self, request):
         serializer = CartCreateSerializer(data=request.data)
         data = request.data
-        CartProductService(request.user)
-        if CartProductService(request.user).check_duplicate_product_in_cart(data['product']):
+        GetOrCreateCart(request.user).get_or_create_cart()
+        if CheckDuplicateProduct(request.user, data['product']).check_duplicate_product_in_cart():
             if serializer.is_valid():
-                instance = serializer.save(price=PriceService(data['product']).get_total_price(data['amount']))
-                instance.owner = CartProductService(request.user).cart_queryset_user
+                instance = serializer.save(price=TotalPrice(data['product'], data['amount']).get_total_price())
+                instance.owner = GetOrCreateCart(request.user).get_or_create_cart()
                 instance.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            CartProductService(request.user).duplicate_finded(data['product'], data['amount'])
+            if serializer.is_valid():
+                DuplicateFinded(request.user, data['product'], data['amount']).duplicate_finded()
         return Response(serializer.errors)
 
 
@@ -346,12 +349,12 @@ class OrderCreateView(APIView):
         serializer = OrderCreateSerializer(data=request.data)
 
         if serializer.is_valid():
-            instance = serializer.save(owner=CartProductService(request.user).cart_queryset_user)
-            instance.final_price = OrderService(request.user).get_total_price_all_cartproduct()
+            instance = serializer.save(owner=GetOrCreateCart(request.user).get_or_create_cart())
+            instance.final_price = OrderTotalPrice(request.user).get_total_price_all_cartproduct()
             instance.save()
-            OrderService(request.user).set_order_for_order_product(instance)
-            OrderService(request.user).send_mail_after_order(instance)
-            CartProductService(request.user).clean_cartproduct()
+            CreateOrderDetail(request.user, instance).create_order_detail()
+            SendMailSalesman(instance).send_mail_after_order()
+            CleanCart(request.user).clean_cart()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors)
 
@@ -403,6 +406,6 @@ class SuperView(APIView):
         data = request.data
         product_serializer = SuperSerializer(data=data)
         if product_serializer.is_valid():
-            SuperService(data).main()
+            CreateProductPrice(data).main()
             return Response(product_serializer.data, status=status.HTTP_201_CREATED)
         return Response(product_serializer.errors)

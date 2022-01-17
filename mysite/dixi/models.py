@@ -1,4 +1,3 @@
-
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -19,7 +18,7 @@ class Product(models.Model):
     material = models.ForeignKey('Material', on_delete=models.CASCADE, verbose_name='Матераил', related_name='material')
     category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
     slug = models.SlugField(unique=True, blank=True, null=True, help_text='<font color="red">'
-                                                                            'Поле заполняется автоматически!</font>')
+                                                                          'Поле заполняется автоматически!</font>')
     season = models.IntegerField(verbose_name='Сезон', choices=Season.choices)
     factory = models.CharField(max_length=50, verbose_name='Фабрика')
     gender = models.IntegerField(verbose_name='Пол', choices=Gender.choices)
@@ -67,7 +66,7 @@ class Category(models.Model):
 
 class Price(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Модель',
-                                   related_name='price')
+                                related_name='price')
     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Цена товара', default=00.00,
                                 )
     discount = models.PositiveIntegerField(default=0, blank=True, verbose_name='Скидка в %', null=True)
@@ -82,7 +81,6 @@ class Price(models.Model):
     class Meta:
         verbose_name = 'Цена'
         verbose_name_plural = 'Цены'
-
 
 
 class Material(models.Model):
@@ -137,8 +135,6 @@ class Cart(models.Model):
         verbose_name_plural = 'Корзина'
 
 
-
-
 class CartProduct(models.Model):
     owner = models.ForeignKey(Cart, on_delete=models.CASCADE, verbose_name='Корзина для пользователя', null=True,
                               blank=True, related_name='product')
@@ -153,7 +149,6 @@ class CartProduct(models.Model):
 
     def __str__(self):
         return f'Товары пользователя {self.owner}'
-
 
 
 class OrderDetail(models.Model):
@@ -180,7 +175,6 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'Оформление заказа'
         verbose_name_plural = verbose_name
-
 
     def __str__(self):
         return f'Заказ для {self.last_name} {self.first_name}'

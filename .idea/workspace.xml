@@ -6,6 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="c8614987-167f-4d99-bc75-3ddd652a7247" name="Changes" comment="Добавлены переменные среды">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysite/dixi/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysite/dixi/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysite/dixi/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/services.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mysite/dixi/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -335,7 +338,14 @@
       <option name="project" value="LOCAL" />
       <updated>1641218768951</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Добавлены переменные среды">
+      <created>1642085118480</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1642085118480</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

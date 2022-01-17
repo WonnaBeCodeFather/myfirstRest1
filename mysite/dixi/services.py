@@ -3,87 +3,170 @@ from django.core.mail import send_mail
 from django.db import transaction
 
 
-class PriceService:
-    def __init__(self, product=None):
-        if product:
-            self.product = product
-            self.get_product_price = Price.objects.get(product=product)
+class TotalPrice:
+    def __init__(self, product, amount):
+        self.get_product_price = Price.objects.get(product=product)
+        self.amount = amount
 
-    @staticmethod
-    def discount_price(price, discount):
-        if discount:
-            new_price = float(price) - ((float(price) / 100) * float(discount))
+    def get_total_price(self):
+        if self.get_product_price.new_price:
+            return self.get_product_price.new_price * self.amount
+        return self.get_product_price.price * self.amount
+
+
+class Discount:
+    def __init__(self, price, discount):
+        self.price = price
+        self.discount = discount
+
+    def discount_price(self):
+        if self.discount:
+            new_price = float(self.price) - ((float(self.price) / 100) * float(self.discount))
             return new_price
         else:
             new_price = 0
             return new_price
 
-    def get_total_price(self, amount):
-        if self.get_product_price.new_price:
-            return self.get_product_price.new_price * amount
-        return self.get_product_price.price * amount
 
-
-class CartProductService:
+class GetOrCreateCart:
     def __init__(self, user):
         self.user = user
-        self.cart_queryset_user = Cart.objects.get_or_create(owner=self.user)[0]
 
-    def check_duplicate_product_in_cart(self, product):
-        get_cartproduct_list = CartProduct.objects.filter(product=product, owner=self.cart_queryset_user)
+    def get_or_create_cart(self):
+        return Cart.objects.get_or_create(owner=self.user)[0]
+
+
+class CheckDuplicateProduct(GetOrCreateCart):
+    def __init__(self, user, product):
+        super().__init__(user)
+        self.product = product
+
+    def check_duplicate_product_in_cart(self):
+        get_cartproduct_list = CartProduct.objects.filter(product=self.product, owner=self.get_or_create_cart())
         if not get_cartproduct_list:
             return True
         return False
 
-    def duplicate_finded(self, product, amount):
-        get_product_in_cartproduct = CartProduct.objects.get(product=product, owner=self.cart_queryset_user)
-        get_product_in_cartproduct.amount = get_product_in_cartproduct.amount + amount
-        get_product_in_cartproduct.price = get_product_in_cartproduct.price + PriceService(product).get_total_price(
-            amount)
+
+class DuplicateFinded(CheckDuplicateProduct):
+    def __init__(self, user, product, amount):
+        super(DuplicateFinded, self).__init__(user, product)
+        self.amount = amount
+
+    def duplicate_finded(self):
+        get_product_in_cartproduct = CartProduct.objects.get(product=self.product, owner=self.get_or_create_cart())
+        get_product_in_cartproduct.amount = get_product_in_cartproduct.amount + self.amount
+        get_product_in_cartproduct.price = get_product_in_cartproduct.price + TotalPrice(self.product,
+                                                                                         self.amount).get_total_price()
         get_product_in_cartproduct.save()
         return get_product_in_cartproduct
 
-    def clean_cartproduct(self):
-        return CartProduct.objects.filter(owner=self.cart_queryset_user).delete()
+
+# class CartProductService:
+#     def __init__(self, user):
+#         self.user = user
+#         self.cart_queryset_user = Cart.objects.get_or_create(owner=self.user)[0]
+#
+#     def check_duplicate_product_in_cart(self, product):
+#         get_cartproduct_list = CartProduct.objects.filter(product=product, owner=self.cart_queryset_user)
+#         if not get_cartproduct_list:
+#             return True
+#         return False
+#
+#     def duplicate_finded(self, product, amount):
+#         get_product_in_cartproduct = CartProduct.objects.get(product=product, owner=self.cart_queryset_user)
+#         get_product_in_cartproduct.amount = get_product_in_cartproduct.amount + amount
+#         get_product_in_cartproduct.price = get_product_in_cartproduct.price + TotalPrice(product).get_total_price(
+#             amount)
+#         get_product_in_cartproduct.save()
+#         return get_product_in_cartproduct
+#
+#     def clean_cartproduct(self):
+#         return CartProduct.objects.filter(owner=self.cart_queryset_user).delete()
+
+class CartProductList(GetOrCreateCart):
+    def __init__(self, user):
+        super().__init__(user)
+        self.cartproduct_list = CartProduct.objects.filter(owner=self.get_or_create_cart())
 
 
-class OrderService:
-    def __init__(self, owner):
-        self.owner = owner
-        self.cartproduct_list = CartProduct.objects.filter(owner=Cart.objects.get(owner=owner))
+class CleanCart(CartProductList):
+    def clean_cart(self):
+        return self.cartproduct_list.delete()
 
+
+class OrderTotalPrice(CartProductList):
     def get_total_price_all_cartproduct(self):
         total_price = []
         for i in self.cartproduct_list:
             total_price.append(i.price)
         return sum(total_price)
 
-    def set_order_for_order_product(self, order):
-        for i in self.cartproduct_list:
-            OrderDetail.objects.create(product=i.product, order=order, amount=i.amount, size=i.size)
 
-    @staticmethod
-    def send_mail_after_order(order):
+class CreateOrderDetail(CartProductList):
+    def __init__(self, user, order):
+        super(CreateOrderDetail, self).__init__(user)
+        self.order = order
+
+    def create_order_detail(self):
+        for i in self.cartproduct_list:
+            OrderDetail.objects.create(product=i.product, order=self.order, amount=i.amount, size=i.size)
+
+
+class SendMailSalesman:
+    def __init__(self, order):
+        self.order = order
+
+    def send_mail_after_order(self):
         send_mail(subject='Новый заказ!',
-                  message=f"Имя - {order.first_name},\n "
-                          f"Фамилия - {order.last_name},\n"
-                          f"Номер телефона - {order.phone_number},\n"
-                          f"Адресс Доставки - {order.delivery_address},\n"
-                          f"Комментарии - {order.description},\n"
-                          f"Сумма заказа - {order.final_price},\n"
-                          f"Продукт и размер {[i.size for i in OrderDetail.objects.filter(order=order)]}",
+                  message=f"Имя - {self.order.first_name},\n "
+                          f"Фамилия - {self.order.last_name},\n"
+                          f"Номер телефона - {self.order.phone_number},\n"
+                          f"Адресс Доставки - {self.order.delivery_address},\n"
+                          f"Комментарии - {self.order.description},\n"
+                          f"Сумма заказа - {self.order.final_price},\n"
+                          f"Продукт и размер {[i.size for i in OrderDetail.objects.filter(order=self.order)]}",
                   from_email='djangodixi@gmail.com',
                   recipient_list=['opiumdlyanaroda3319@gmail.com'])
 
 
-class SuperService:
+# class OrderService:
+#     def __init__(self, owner):
+#         self.owner = owner
+#         self.cartproduct_list = CartProduct.objects.filter(owner=Cart.objects.get(owner=owner))
+#
+#     def get_total_price_all_cartproduct(self):
+#         total_price = []
+#         for i in self.cartproduct_list:
+#             total_price.append(i.price)
+#         return sum(total_price)
+#
+#     def set_order_for_order_product(self, order):
+#         for i in self.cartproduct_list:
+#             OrderDetail.objects.create(product=i.product, order=order, amount=i.amount, size=i.size)
+#
+#     @staticmethod
+#     def send_mail_after_order(order):
+#         send_mail(subject='Новый заказ!',
+#                   message=f"Имя - {order.first_name},\n "
+#                           f"Фамилия - {order.last_name},\n"
+#                           f"Номер телефона - {order.phone_number},\n"
+#                           f"Адресс Доставки - {order.delivery_address},\n"
+#                           f"Комментарии - {order.description},\n"
+#                           f"Сумма заказа - {order.final_price},\n"
+#                           f"Продукт и размер {[i.size for i in OrderDetail.objects.filter(order=order)]}",
+#                   from_email='djangodixi@gmail.com',
+#                   recipient_list=['opiumdlyanaroda3319@gmail.com'])
 
+
+class DataService:
     def __init__(self, data):
         self.data = data
 
-    @transaction.atomic
-    def main(self):
-        SuperService(self.data).create_product()
+
+class CreateProduct(DataService):
+    def __init__(self, data):
+        super(CreateProduct, self).__init__(data)
 
     def create_product(self):
         get_material = Material.objects.get(id=self.data['material'])
@@ -94,17 +177,58 @@ class SuperService:
                                          gender=self.data['gender'],
                                          category=get_category,
                                          material=get_material)
-        return SuperService(self.data).create_price(product)
+        return product
 
-    def create_price(self, product):
+
+class CreatePrice(CreateProduct):
+
+    def create_price(self):
         set_new_price = 0.00
         if self.data['price']['discount']:
             new_price = float(self.data['price']['price']) - ((float(self.data['price']['price']) / 100)
                                                               * float(self.data['price']['discount']))
             set_new_price = new_price
-
-        price = Price.objects.create(product=product,
+        price = Price.objects.create(product=self.create_product(),
                                      price=self.data['price']['price'],
                                      discount=self.data['price']['discount'],
                                      new_price=set_new_price)
         return price
+
+
+class CreateProductPrice(DataService):
+    @transaction.atomic
+    def main(self):
+        CreatePrice(self.data).create_price()
+
+# class SuperService:
+#
+#     def __init__(self, data):
+#         self.data = data
+#
+#     @transaction.atomic
+#     def main(self):
+#         SuperService(self.data).create_product()
+#
+#     def create_product(self):
+#         get_material = Material.objects.get(id=self.data['material'])
+#         get_category = Category.objects.get(id=self.data['category'])
+#         product = Product.objects.create(title=self.data['title'],
+#                                          season=self.data['season'],
+#                                          factory=self.data['factory'],
+#                                          gender=self.data['gender'],
+#                                          category=get_category,
+#                                          material=get_material)
+#         return SuperService(self.data).create_price(product)
+#
+#     def create_price(self, product):
+#         set_new_price = 0.00
+#         if self.data['price']['discount']:
+#             new_price = float(self.data['price']['price']) - ((float(self.data['price']['price']) / 100)
+#                                                               * float(self.data['price']['discount']))
+#             set_new_price = new_price
+#
+#         price = Price.objects.create(product=product,
+#                                      price=self.data['price']['price'],
+#                                      discount=self.data['price']['discount'],
+#                                      new_price=set_new_price)
+#         return price
