@@ -1,6 +1,7 @@
 from .models import Price, Cart, CartProduct, OrderDetail, Category, Product, Material
 from django.core.mail import send_mail
 from django.db import transaction
+from pytils.translit import slugify
 
 
 class TotalPrice:
@@ -171,7 +172,9 @@ class CreateProduct(DataService):
     def create_product(self):
         get_material = Material.objects.get(id=self.data['material'])
         get_category = Category.objects.get(id=self.data['category'])
+        get_slug = slugify(self.data['title'])
         product = Product.objects.create(title=self.data['title'],
+                                         slug=get_slug,
                                          season=self.data['season'],
                                          factory=self.data['factory'],
                                          gender=self.data['gender'],
@@ -183,11 +186,7 @@ class CreateProduct(DataService):
 class CreatePrice(CreateProduct):
 
     def create_price(self):
-        set_new_price = 0.00
-        if self.data['price']['discount']:
-            new_price = float(self.data['price']['price']) - ((float(self.data['price']['price']) / 100)
-                                                              * float(self.data['price']['discount']))
-            set_new_price = new_price
+        set_new_price = Discount(self.data['price']['price'], self.data['price']['discount']).discount_price()
         price = Price.objects.create(product=self.create_product(),
                                      price=self.data['price']['price'],
                                      discount=self.data['price']['discount'],
@@ -195,7 +194,7 @@ class CreatePrice(CreateProduct):
         return price
 
 
-class CreateProductPrice(DataService):
+class CreateProductPriceService(DataService):
     @transaction.atomic
     def main(self):
         CreatePrice(self.data).create_price()

@@ -14,7 +14,7 @@ urlpatterns = [
     path('price/<int:pk>/update', views.PriceUpdateView.as_view()),
     path('product/', views.ProductListView.as_view()),
     path('product/<slug:slug>/', views.ProductDetailView.as_view()),
-    path('superview/', views.SuperView.as_view()),
+    path('superview/', views.CreateProductPrice.as_view()),
 
 
     path('reviews/create/', views.ReviewCreateView.as_view()),

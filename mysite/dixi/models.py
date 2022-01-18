@@ -1,7 +1,6 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
-from pytils.translit import slugify
 
 
 class Product(models.Model):
@@ -32,11 +31,6 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Модель'
         verbose_name_plural = 'Модели'
-
-    def save(self, *args, **kwargs):
-        get_name = str(self.title)
-        self.slug = slugify(get_name)
-        super(Product, self).save(*args, **kwargs)
 
 
 class Size(models.Model):
@@ -160,6 +154,9 @@ class OrderDetail(models.Model):
     class Meta:
         verbose_name = 'Товары в заказе'
         verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return f'Order: {self.order.pk} | Product: {self.product} | Size: {self.size}'
 
 
 class Order(models.Model):
