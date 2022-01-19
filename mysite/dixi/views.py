@@ -400,12 +400,12 @@ class GalleryCreateView(APIView):
         return Response(serializer.errors)
 
 
-class SuperView(APIView):
+class CreateProductPrice(APIView):
 
     def post(self, request):
         data = request.data
         product_serializer = SuperSerializer(data=data)
         if product_serializer.is_valid():
-            CreateProductPrice(data).main()
+            CreateProductService(data).fill_product()
             return Response(product_serializer.data, status=status.HTTP_201_CREATED)
         return Response(product_serializer.errors)

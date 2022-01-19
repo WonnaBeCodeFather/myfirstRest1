@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c8614987-167f-4d99-bc75-3ddd652a7247" name="Changes" comment="Добавлены переменные среды">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mysite/dixi/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mysite/dixi/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/serializers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mysite/dixi/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/services.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mysite/dixi/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/views.py" afterDir="false" />
     </list>
