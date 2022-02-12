@@ -34,7 +34,8 @@ class Product(models.Model):
 
 
 class Size(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, verbose_name='Наименование модели', null=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, verbose_name='Наименование модели', null=True,
+                                related_name='size')
     size = models.PositiveIntegerField(default=36)
     amount = models.IntegerField(verbose_name='Количество товара', default=0)
 
@@ -89,7 +90,8 @@ class Material(models.Model):
 
 
 class Gallery(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Наименование модели')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Наименование модели',
+                                related_name='image')
     image = models.ImageField(verbose_name='Фото', null=True)
 
     def __str__(self):

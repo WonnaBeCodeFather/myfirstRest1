@@ -6,8 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="c8614987-167f-4d99-bc75-3ddd652a7247" name="Changes" comment="Добавлены переменные среды">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysite/dixi/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysite/dixi/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/serializers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mysite/dixi/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysite/dixi/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mysite/dixi/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/dixi/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysite/mysite/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/mysite/mysite/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,15 +127,15 @@
       <method v="2" />
     </configuration>
     <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="myfirstRest" />
+      <module name="myfirstRest1" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="D:\myfirstRest\venv\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/mysite/dixi" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -151,8 +155,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.models" />
         <item itemvalue="Python.test" />
+        <item itemvalue="Python.models" />
         <item itemvalue="Python.test" />
       </list>
     </recent_temporary>
@@ -167,6 +171,7 @@
       <updated>1635173149305</updated>
       <workItem from="1641311338208" duration="1034000" />
       <workItem from="1641312525453" duration="13000" />
+      <workItem from="1644671498903" duration="34000" />
     </task>
     <task id="LOCAL-00001" summary="as">
       <created>1636303460150</created>

@@ -164,7 +164,7 @@ class CreateProductService:
     def __init__(self, data):
         self.data = data
 
-    def create_product(self):
+    def __create_product(self):
         get_material = Material.objects.get(id=self.data['material'])
         get_category = Category.objects.get(id=self.data['category'])
         get_slug = slugify(self.data['title'])
@@ -176,7 +176,7 @@ class CreateProductService:
                                       category=get_category,
                                       material=get_material)
 
-    def create_price(self, product):
+    def __create_price(self, product):
         set_new_price = Discount(self.data['price']['price'], self.data['price']['discount']).discount_price()
         return Price.objects.create(product=product,
                                      price=self.data['price']['price'],
@@ -185,5 +185,5 @@ class CreateProductService:
 
     @transaction.atomic
     def fill_product(self):
-        product = self.create_product()
-        price = self.create_price(product)
+        product = self.__create_product()
+        price = self.__create_price(product)

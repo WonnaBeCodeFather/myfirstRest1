@@ -45,9 +45,27 @@ class PriceCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gallery
+        fields = '__all__'
+
+
+class SizeCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Size
+        fields = '__all__'
+
+
 class ProductListSerializer(serializers.ModelSerializer):
+    price = PriceSerializer(many=True)
     category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all())
     material = serializers.SlugRelatedField(slug_field='name', queryset=Material.objects.all())
+    reviews = ReviewsParentSerializer(many=True)
+    gender = serializers.CharField(source='get_gender_display')
+    season = serializers.CharField(source='get_season_display')
+    image = ImageSerializer(many=True)
+    size = SizeCreateSerializer(many=True)
 
     class Meta:
         model = Product
@@ -60,15 +78,9 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SizeCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Size
-        fields = '__all__'
-
-
 class ProductDetailSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    material = serializers.SlugRelatedField(slug_field='name_model', read_only=True)
+    material = serializers.SlugRelatedField(slug_field='name', read_only=True)
     reviews = ReviewsParentSerializer(many=True)
     gender = serializers.CharField(source='get_gender_display')
     season = serializers.CharField(source='get_season_display')
@@ -76,7 +88,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id','category', 'name', 'price', 'material', 'season', 'factory',
+        fields = ['id', 'category', 'title', 'price', 'material', 'season', 'factory',
                   'gender', 'reviews']
 
 
@@ -162,7 +174,6 @@ class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Material
         fields = "__all__"
-
 
 
 class SuperPriceSerializer(serializers.ModelSerializer):

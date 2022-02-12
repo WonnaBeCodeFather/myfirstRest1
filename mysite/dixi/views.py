@@ -9,7 +9,6 @@ from .services import *
 # Products
 
 
-
 class ProductListView(APIView):
     """Get all products"""
 
@@ -409,3 +408,11 @@ class CreateProductPrice(APIView):
             CreateProductService(data).fill_product()
             return Response(product_serializer.data, status=status.HTTP_201_CREATED)
         return Response(product_serializer.errors)
+
+
+class GetSelfUser(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+
+    def get(self, request):
+        return Response({"username": request.user.username})
